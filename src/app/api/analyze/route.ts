@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { PDFParse } from "pdf-parse";
+import { extractText, getDocumentProxy } from "unpdf";
 import type { AnalysisResult } from "@/lib/types";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -56,13 +56,9 @@ interface ParsedInputs {
 
 async function extractPdfText(file: File): Promise<string> {
   const buffer = new Uint8Array(await file.arrayBuffer());
-  const parser = new PDFParse({ data: buffer });
-  try {
-    const { text } = await parser.getText();
-    return text.trim();
-  } finally {
-    await parser.destroy();
-  }
+  const pdf = await getDocumentProxy(buffer);
+  const { text } = await extractText(pdf, { mergePages: true });
+  return text.trim();
 }
 
 async function readInputs(request: Request): Promise<ParsedInputs> {
