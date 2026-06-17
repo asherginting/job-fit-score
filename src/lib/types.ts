@@ -13,7 +13,7 @@ export interface Suggestion {
 
 export interface AnalysisInput {
   cvText: string;
-  cvFileName: string | null;
+  cvFile: File | null;
   jobDescription: string;
 }
 

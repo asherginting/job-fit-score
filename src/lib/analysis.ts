@@ -1,12 +1,42 @@
 import type { AnalysisInput, AnalysisResult, VerdictMeta } from "./types";
-import { sampleResult } from "./sample-data";
 
 export async function analyzeMatch(
   input: AnalysisInput,
 ): Promise<AnalysisResult> {
-  void input;
-  await delay(1500);
-  return sampleResult;
+  let response: Response;
+
+  try {
+    if (input.cvFile) {
+      const form = new FormData();
+      form.append("cvFile", input.cvFile);
+      form.append("jobDescription", input.jobDescription);
+      response = await fetch("/api/analyze", { method: "POST", body: form });
+    } else {
+      response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cvText: input.cvText,
+          jobDescription: input.jobDescription,
+        }),
+      });
+    }
+  } catch {
+    throw new Error(
+      "Couldn't reach the server. Check your connection and try again.",
+    );
+  }
+
+  const data = (await response.json().catch(() => null)) as {
+    result?: AnalysisResult;
+    error?: string;
+  } | null;
+
+  if (!response.ok || !data?.result) {
+    throw new Error(data?.error ?? "Something went wrong. Please try again.");
+  }
+
+  return data.result;
 }
 
 export function getVerdict(score: number): VerdictMeta {
@@ -29,8 +59,4 @@ export function getVerdict(score: number): VerdictMeta {
     label: "Not yet",
     message: "The gap is too large for this role right now.",
   };
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

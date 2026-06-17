@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Hanken_Grotesk } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -29,7 +30,10 @@ export default function RootLayout({
       lang="en"
       className={`${fraunces.variable} ${hanken.variable} h-full`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        {children}
+        <Toaster position="top-center" richColors closeButton />
+      </body>
     </html>
   );
 }

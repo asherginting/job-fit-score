@@ -168,8 +168,7 @@ function CvField({
       )}
 
       <p className="text-xs text-ink-muted">
-        PDF only, up to 5&nbsp;MB. Your file never leaves your browser in this
-        preview.
+        PDF only, up to 5&nbsp;MB. Must be a text-based PDF (not a scan).
       </p>
     </section>
   );
@@ -230,10 +229,15 @@ export function AnalysisForm({
   });
   const [jobDescription, setJobDescription] = useState("");
 
+  const cvProvided =
+    cv.mode === "upload" ? cv.file !== null : cv.text.trim().length > 0;
+  const jdProvided = jobDescription.trim().length > 0;
+  const canSubmit = cvProvided && jdProvided && !loading;
+
   function handleSubmit() {
     onAnalyze({
       cvText: cv.mode === "paste" ? cv.text : "",
-      cvFileName: cv.mode === "upload" ? (cv.file?.name ?? null) : null,
+      cvFile: cv.mode === "upload" ? cv.file : null,
       jobDescription,
     });
   }
@@ -251,8 +255,10 @@ export function AnalysisForm({
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={loading}
-          className="group relative inline-flex h-14 min-w-56 items-center justify-center gap-3 rounded-full bg-accent px-9 text-base font-semibold text-white shadow-lift transition-all duration-300 hover:bg-accent-deep hover:shadow-soft active:scale-[0.98] disabled:cursor-wait disabled:opacity-90"
+          disabled={!canSubmit}
+          className={`group relative inline-flex h-14 min-w-56 items-center justify-center gap-3 rounded-full bg-accent px-9 text-base font-semibold text-white shadow-lift transition-all duration-300 hover:bg-accent-deep hover:shadow-soft active:scale-[0.98] disabled:opacity-90 ${
+            loading ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"
+          }`}
         >
           {loading ? (
             <>
@@ -277,7 +283,9 @@ export function AnalysisForm({
           )}
         </button>
         <p className="text-xs text-ink-muted">
-          Takes a few seconds. No sign-up required.
+          {canSubmit || loading
+            ? "Takes a few seconds. No sign-up required."
+            : "Add your CV and a job description to enable analysis."}
         </p>
       </div>
     </div>

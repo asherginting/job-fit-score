@@ -39,7 +39,8 @@ export default function Home() {
       </div>
 
       <footer className="mt-20 border-t border-hairline pt-6 text-center text-xs text-ink-muted">
-        Job Fit Score · Preview build with sample analysis data.
+        Job Fit Score · An AI estimate to guide your CV — not a guarantee of an
+        interview.
       </footer>
     </main>
   );
